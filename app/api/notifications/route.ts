@@ -2,6 +2,9 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
+// ⚡ Mark this route as dynamic so Next.js doesn't try to pre-render it
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     // Get logged-in user session
