@@ -4,6 +4,9 @@ import { NextRequest } from "next/server";
 import { ok, serverError, readPaginationParams } from "@/lib/http";
 import type { Prisma } from "@prisma/client";
 
+// ⚡ Force this API route to be dynamic (avoid static rendering error)
+export const dynamic = "force-dynamic";
+
 const SORTABLE = [
   "applicant",
   "email",
