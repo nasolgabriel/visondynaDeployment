@@ -1,0 +1,254 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// *
+///  * =========================
+///  * USER
+///  * =========================
+model User {
+  id                     String                  @id @default(uuid())
+  firstname              String
+  lastname               String
+  email                  String                  @unique
+  role                   Role
+  birthDate              DateTime?
+  gender                 String
+  password               String
+  emailVerified          DateTime?
+  isSuspended            Boolean                 @default(false)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  deletedAt              DateTime?
+  applications           Application[]
+  emailVerificationToken EmailVerificationToken?
+  jobs                   Job[]                   @relation("PostedJobs")
+  messagesSent           Message[]               @relation("MessageSender")
+  notifications          Notification[]
+  applicantInfo          Profile?
+}
+
+/// *
+///  * =========================
+///  * PROFILE
+///  * =========================
+model Profile {
+  id               String              @id @default(uuid())
+  userId           String              @unique
+  profileSummary   String?
+  phone            String?
+  profession       String?
+  resumeUrl        String?
+  imageUrl         String?
+  createdAt        DateTime            @default(now())
+  profileCompleted Boolean?
+  skills           ApplicantSkillTag[]
+  conversations    Conversation[]
+  education        Education[]
+  experience       Experience[]
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// *
+///  * =========================
+///  * CATEGORY & SKILLS
+///  * =========================
+model Category {
+  id     String     @id @default(uuid())
+  name   String
+  jobs   Job[]
+  skills SkillTag[]
+}
+
+model SkillTag {
+  id         String              @id @default(uuid())
+  name       String
+  categoryId String
+  profiles   ApplicantSkillTag[]
+  jobs       JobSkillTag[]
+  category   Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, name])
+  @@index([categoryId])
+}
+
+model ApplicantSkillTag {
+  profileId        String
+  skillId          String
+  applicantProfile Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill            SkillTag @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, skillId])
+}
+
+/// *
+///  * =========================
+///  * EDUCATION & EXPERIENCE
+///  * =========================
+model Education {
+  id                 String    @id @default(uuid())
+  course             String
+  institution        String
+  graduated          Boolean
+  enrolledDate       DateTime?
+  graduationDate     DateTime?
+  applicantProfileId String?
+  ApplicantProfile   Profile?  @relation(fields: [applicantProfileId], references: [id], onDelete: Cascade)
+}
+
+model Experience {
+  id           String    @id @default(uuid())
+  job          String
+  company      String
+  startDate    DateTime?
+  lastAttended DateTime?
+  profileId    String
+  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+/// *
+///  * =========================
+///  * JOB & APPLICATION
+///  * =========================
+model Job {
+  id           String        @id @default(uuid())
+  title        String
+  description  String
+  location     String
+  salary       Int
+  manpower     Int
+  company      String
+  categoryId   String
+  status       JobStatus     @default(OPEN)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  postedById   String?
+  applications Application[]
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  postedBy     User?         @relation("PostedJobs", fields: [postedById], references: [id])
+  skills       JobSkillTag[]
+}
+
+model Application {
+  id          String            @id @default(uuid())
+  applicantId String
+  jobId       String
+  formData    Json
+  status      ApplicationStatus @default(SUBMITTED)
+  submittedAt DateTime          @default(now())
+  deletedAt   DateTime?
+  applicant   User              @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([applicantId, jobId])
+  @@index([jobId, applicantId])
+}
+
+/// *
+///  * =========================
+///  * NOTIFICATIONS (FIXED)
+///  * =========================
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  message   String
+  type      ApplicationStatus?
+  isRead    Boolean            @default(false)
+  createdAt DateTime           @default(now())
+  company   String?
+  jobTitle  String?
+  location  String?
+  status    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// *
+///  * =========================
+///  * JOB SKILLS
+///  * =========================
+model JobSkillTag {
+  jobId      String
+  skillTagId String
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skillTag   SkillTag @relation(fields: [skillTagId], references: [id])
+
+  @@id([jobId, skillTagId])
+}
+
+/// *
+///  * =========================
+///  * EMAIL VERIFICATION
+///  * =========================
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  tokenHash String   @unique
+  expires   DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// *
+///  * =========================
+///  * MESSAGING
+///  * =========================
+model Conversation {
+  id                 String    @id @default(cuid())
+  applicantProfileId String
+  subject            String?
+  lastMessageAt      DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  applicant          Profile   @relation(fields: [applicantProfileId], references: [id], onDelete: Cascade)
+  messages           Message[]
+
+  @@index([applicantProfileId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderRole     Role
+  senderUserId   String?
+  content        String
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User?        @relation("MessageSender", fields: [senderUserId], references: [id])
+
+  @@index([conversationId])
+  @@index([senderUserId])
+}
+
+/// *
+///  * =========================
+///  * ENUMS
+///  * =========================
+enum Role {
+  ADMIN
+  APPLICANT
+  HR
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+  FILLED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  SHORTLISTED
+  INTERVIEWED
+  OFFERED
+  HIRED
+  REJECTED
+}
