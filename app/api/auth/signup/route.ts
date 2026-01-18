@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { Resend } from "resend";
 import VerificationEmail from "@/components/email/verification-email";
+import { getBaseUrl } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -92,7 +93,8 @@ export async function POST(req: NextRequest) {
       data: { userId: newUser.id, tokenHash, expires },
     });
 
-    const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${token}`;
+    const baseUrl = getBaseUrl();
+    const verifyUrl = `${baseUrl}/auth/verify-email?token=${token}`;
 
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,
