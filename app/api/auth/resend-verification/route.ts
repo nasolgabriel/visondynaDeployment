@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { Resend } from "resend";
 import VerificationEmail from "@/components/email/verification-email";
 import crypto from "crypto";
+import { getBaseUrl } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -55,7 +56,8 @@ export async function POST(req: NextRequest) {
     });
 
     // Send email with the verification link using Resend
-    const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${token}`;
+    const baseUrl = getBaseUrl();
+    const verifyUrl = `${baseUrl}/auth/verify-email?token=${token}`;
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to: user.email,

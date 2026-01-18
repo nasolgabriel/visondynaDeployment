@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { Resend } from "resend";
 import VerificationEmail from "@/components/email/verification-email";
+import { getBaseUrl } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -71,9 +72,10 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (!account || account.provider === "credentials") return true;
 
+      const baseUrl = getBaseUrl();
       const email = user.email ?? "";
       if (!email) {
-        const url = new URL("/auth/signin", process.env.NEXTAUTH_URL);
+        const url = new URL("/auth/signin", baseUrl);
         url.searchParams.set("error", "OAuthNoEmail");
         return url.toString();
       }
@@ -141,7 +143,7 @@ export const authOptions: NextAuthOptions = {
           create: { userId, tokenHash, expires },
         });
 
-        const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${token}`;
+        const verifyUrl = `${baseUrl}/auth/verify-email?token=${token}`;
         const { error } = await resend.emails.send({
           from: process.env.EMAIL_FROM!,
           to: email,
@@ -152,12 +154,12 @@ export const authOptions: NextAuthOptions = {
           }),
         });
         if (error) {
-          const url = new URL("/auth/signin", process.env.NEXTAUTH_URL);
+          const url = new URL("/auth/signin", baseUrl);
           url.searchParams.set("error", "EmailSendFailed");
           return url.toString();
         }
 
-        const url = new URL("/auth/verify-email", process.env.NEXTAUTH_URL);
+        const url = new URL("/auth/verify-email", baseUrl);
         url.searchParams.set("checkInbox", "1");
         return url.toString();
       }
