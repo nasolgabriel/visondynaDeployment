@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { JobsMetaCursor } from "@/lib/types";
 import ArchivedJobsTable from "@/components/jobs/table/archived-jobs-table";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_LIMIT = 10;
 
 async function fetchInitialData() {

@@ -17,6 +17,8 @@ import ManageExperiences from "@/components/profile/manage-experiences";
 import ManageEducations from "@/components/profile/manage-educations";
 import { notFound, redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function ApplicantProfile() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/signin");

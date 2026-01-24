@@ -8,6 +8,8 @@ import Link from "next/link";
 import DarkVeil from "@/components/dark-veil";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const jobs = await prisma.job.findMany({
     select: {

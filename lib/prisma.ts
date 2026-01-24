@@ -4,18 +4,25 @@ import {
   JobStatus,
   Role,
 } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
-import { env } from "prisma/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
 };
 
+const datasourceUrl = process.env.SUPABASE_DATABASE_URL;
+
+if (!datasourceUrl) {
+  throw new Error("SUPABASE_DATABASE_URL is not set");
+}
+
+const pool = new Pool({ connectionString: datasourceUrl });
+const adapter = new PrismaPg(pool);
+
 const prisma =
   globalForPrisma.prisma ||
-  new PrismaClient({ accelerateUrl: env("PRISMA_DATABASE_URL") }).$extends(
-    withAccelerate(),
-  );
+  new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 

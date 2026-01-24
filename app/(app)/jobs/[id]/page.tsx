@@ -14,6 +14,8 @@ import {
 import { Banknote, MapPin } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = { params: { id: string } };
 
 export async function generateMetadata({ params }: PageProps) {

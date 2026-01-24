@@ -16,6 +16,8 @@ import { User, Settings } from "lucide-react";
 import FeedList from "@/components/feed-list";
 import { getRecommendedJobsPage } from "@/lib/job-recommendation"; // 👈 NEW
 
+export const dynamic = "force-dynamic";
+
 const PAGE_SIZE = 10;
 
 export default async function Feed() {

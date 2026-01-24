@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import ApplicationsTable from "@/components/applications/table/applications-table";
 import type { ApplicationsMetaCursor } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_LIMIT = 10;
 
 async function fetchInitialData() {
