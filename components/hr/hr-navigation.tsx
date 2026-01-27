@@ -16,7 +16,7 @@ const items = [
   { href: "/hr/jobs", label: "Jobs", icon: BriefcaseBusiness },
   { href: "/hr/applications", label: "Applications", icon: FileUser },
   { href: "/hr/messages", label: "Messages", icon: MessageCircle },
-  { href: "/hr/announcements", label: "Announcements", icon: Bell },
+  // { href: "/hr/announcements", label: "Announcements", icon: Bell }, // Adjustment requested by clients
 ];
 
 export default function HrNavigation() {

@@ -7,7 +7,7 @@ const roleAccessMap = {
   ADMIN: ["/admin/dashboard", "/admin/jobs", "/admin/users"],
   HR: [
     "/hr/dashboard",
-    "/hr/announcements",
+    // "/hr/announcements", Adjustment requested by clients
     "/hr/jobs",
     "/hr/messages",
     "/hr/applications",
