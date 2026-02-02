@@ -61,9 +61,9 @@ function OnBoardContent() {
           "Your profile is now set up. You're all set to get started — welcome aboard! 🚀",
       });
 
-      // Small delay to ensure session is fully updated before redirect
+      // Hard navigation to ensure fresh page load with updated session
       setTimeout(() => {
-        router.push("/feed");
+        window.location.href = "/feed";
       }, 500);
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
