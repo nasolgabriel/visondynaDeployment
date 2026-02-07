@@ -208,15 +208,19 @@ export default function ManageEducations({
                   id="graduated"
                   checked={form.graduated}
                   onCheckedChange={(v) =>
-                    setForm((f) => ({ ...f, graduated: Boolean(v) }))
+                    setForm((f) => ({ 
+                      ...f, 
+                      graduated: Boolean(v),
+                      graduationDate: v ? f.graduationDate : undefined
+                    }))
                   }
                 />
                 <Label htmlFor="graduated">Graduated</Label>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className={form.graduated ? "grid grid-cols-2 gap-3" : ""}>
                 <div>
-                  <Label htmlFor="enrolledDate">Enrolled</Label>
+                  <Label htmlFor="enrolledDate">Enrolled Date</Label>
                   <Input
                     id="enrolledDate"
                     type="date"
@@ -226,17 +230,19 @@ export default function ManageEducations({
                     }
                   />
                 </div>
-                <div>
-                  <Label htmlFor="graduationDate">Graduation</Label>
-                  <Input
-                    id="graduationDate"
-                    type="date"
-                    value={form.graduationDate ?? ""}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, graduationDate: e.target.value }))
-                    }
-                  />
-                </div>
+                {form.graduated && (
+                  <div>
+                    <Label htmlFor="graduationDate">Graduation Date</Label>
+                    <Input
+                      id="graduationDate"
+                      type="date"
+                      value={form.graduationDate ?? ""}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, graduationDate: e.target.value }))
+                      }
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
